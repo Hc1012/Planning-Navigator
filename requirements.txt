@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+httpx
+pyyaml
+# anthropic (below) is the SDK for the live explain/verify LLM. Installing it changes
+# nothing by itself: the app and eval only call the API when BOTH PLANNING_USE_ANTHROPIC=1
+# and ANTHROPIC_API_KEY are set — otherwise the free deterministic fallback runs.
+anthropic

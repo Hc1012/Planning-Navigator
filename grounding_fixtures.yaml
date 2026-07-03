@@ -1,0 +1,134 @@
+# Grounding-verifier eval fixtures - a mini RepoVeritas for the policy verifier.
+#
+# Each row pairs a REAL Southwark Plan excerpt (verbatim, taken from the gold-label map) with a
+# claim and a gold label. The runner (run_grounding_eval.py) feeds (excerpt, claim) to whatever
+# verifier is wired in (deterministic now, live LLM once enabled) and scores the prediction.
+#
+# Labels (the labelling rubric - keep these strict; the insufficient class is the hard one):
+#   supported    - EVERY substantive assertion in the claim is directly supported by the excerpt.
+#   insufficient - the claim asserts something the excerpt does NOT establish. It may well be true
+#                  in the real world (e.g. a genuine rule) - but if it isn't in the excerpt, it's
+#                  insufficient. This is the abstention class the product depends on.
+#   contradicted - the claim asserts something the excerpt directly contradicts.
+#
+# The excerpts here are PINNED copies of the map's excerpts; the runner drift-checks them against
+# the live map and fails loudly if they diverge, so the labels can't silently go stale.
+#
+# Design notes for reviewing labels:
+#   - Several excerpts appear under more than one class with different claims. That is deliberate:
+#     it tests whether the verifier discriminates on the CLAIM, not just the excerpt.
+#   - The insufficient rows use claims that are plausible planning facts (a 3 m depth limit, needing
+#     Listed Building Consent, a 27% VSC daylight test). They are realistic and often TRUE - but not
+#     grounded in the given excerpt. A good verifier abstains; a careless one waves them through.
+
+fixtures:
+  # ---------------- SUPPORTED (claim fully grounded in the excerpt) ----------------
+  - id: P56-sup-1
+    policy_id: P56
+    excerpt: "Development should not be permitted when it causes an unacceptable loss of amenity to present or future occupiers or users"
+    claim: "For your extension, this policy means it should not cause an unacceptable loss of amenity to present or future occupiers."
+    gold: supported
+
+  - id: P20-sup-1
+    policy_id: P20
+    excerpt: "preserves or enhances the character or appearance of conservation areas and their settings"
+    claim: "In a conservation area, your extension should preserve or enhance the character or appearance of the area and its setting."
+    gold: supported
+
+  - id: P13-sup-1
+    policy_id: P13
+    excerpt: "height, scale, massing and arrangement respond positively to the existing townscape, character and context"
+    claim: "The height, scale and massing of the extension should respond positively to the existing townscape and context."
+    gold: supported
+
+  - id: P61-sup-1
+    policy_id: P61
+    excerpt: "Development must retain and protect significant existing trees. Retained trees must be protected during the construction process in line with British Standard BS5837."
+    claim: "Significant existing trees should be retained and protected, and any retained trees protected during construction in line with BS5837."
+    gold: supported
+
+  - id: P68-sup-1
+    policy_id: P68
+    excerpt: "Development must not increase flood risk on or off site"
+    claim: "Your development must not increase flood risk, whether on the site or off it."
+    gold: supported
+
+  - id: P19-sup-1
+    policy_id: P19
+    excerpt: "only be permitted if it conserves or enhances their special significance"
+    claim: "Works to a listed building should only be permitted if they conserve or enhance its special significance."
+    gold: supported
+
+  # ---------------- INSUFFICIENT (plausible, often true, but NOT in the excerpt) ----------------
+  - id: P56-insuf-1
+    policy_id: P56
+    excerpt: "Development should not be permitted when it causes an unacceptable loss of amenity to present or future occupiers or users"
+    claim: "This policy sets a maximum depth of 3 metres for a single-storey rear extension."
+    gold: insufficient
+
+  - id: P20-insuf-1
+    policy_id: P20
+    excerpt: "preserves or enhances the character or appearance of conservation areas and their settings"
+    claim: "In a conservation area you must use London stock brick and timber sash windows."
+    gold: insufficient
+
+  - id: P68-insuf-1
+    policy_id: P68
+    excerpt: "Development must not increase flood risk on or off site"
+    claim: "You must submit a site-specific flood risk assessment with your application."
+    gold: insufficient
+
+  - id: P19-insuf-1
+    policy_id: P19
+    excerpt: "only be permitted if it conserves or enhances their special significance"
+    claim: "You will need separate Listed Building Consent before carrying out any works."
+    gold: insufficient
+
+  - id: P14-insuf-1
+    policy_id: P14
+    excerpt: "adequate daylight, sunlight, outlook, and a comfortable microclimate ... for new and existing residents"
+    claim: "A daylight assessment must demonstrate at least a 27% vertical sky component for neighbouring windows."
+    gold: insufficient
+
+  - id: P13-insuf-1
+    policy_id: P13
+    excerpt: "height, scale, massing and arrangement respond positively to the existing townscape, character and context"
+    claim: "The extension must not be visible from the public street."
+    gold: insufficient
+
+  # ---------------- CONTRADICTED (claim is opposite to the excerpt) ----------------
+  - id: P56-con-1
+    policy_id: P56
+    excerpt: "Development should not be permitted when it causes an unacceptable loss of amenity to present or future occupiers or users"
+    claim: "This policy confirms that causing a loss of amenity to neighbours is acceptable and will not affect the decision."
+    gold: contradicted
+
+  - id: P68-con-1
+    policy_id: P68
+    excerpt: "Development must not increase flood risk on or off site"
+    claim: "This policy permits development that increases flood risk on neighbouring land."
+    gold: contradicted
+
+  - id: P20-con-1
+    policy_id: P20
+    excerpt: "preserves or enhances the character or appearance of conservation areas and their settings"
+    claim: "In a conservation area, harming the area's character is acceptable as long as the work is at the rear."
+    gold: contradicted
+
+  - id: P19-con-1
+    policy_id: P19
+    excerpt: "only be permitted if it conserves or enhances their special significance"
+    claim: "Works to a listed building are permitted even where they harm its special significance."
+    gold: contradicted
+
+  - id: P61-con-1
+    policy_id: P61
+    excerpt: "Development must retain and protect significant existing trees. Retained trees must be protected during the construction process in line with British Standard BS5837."
+    claim: "This policy allows significant trees to be removed without protection or replacement."
+    gold: contradicted
+
+  - id: P13-con-1
+    policy_id: P13
+    excerpt: "height, scale, massing and arrangement respond positively to the existing townscape, character and context"
+    claim: "The scale and massing of the extension can disregard the surrounding townscape and context."
+    gold: contradicted

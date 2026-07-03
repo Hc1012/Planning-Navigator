@@ -1,0 +1,176 @@
+{
+  "verifier": "AnthropicLLM",
+  "model": "claude-haiku-4-5-20251001",
+  "prompts_version": "v2",
+  "run_utc": "2026-07-02T13:19:23+00:00",
+  "metrics": {
+    "n": 18,
+    "accuracy": 0.9444444444444444,
+    "confusion": {
+      "SUPPORTED": {
+        "SUPPORTED": 6,
+        "INSUFFICIENT": 0,
+        "CONTRADICTED": 0
+      },
+      "INSUFFICIENT": {
+        "SUPPORTED": 0,
+        "INSUFFICIENT": 5,
+        "CONTRADICTED": 1
+      },
+      "CONTRADICTED": {
+        "SUPPORTED": 0,
+        "INSUFFICIENT": 0,
+        "CONTRADICTED": 6
+      }
+    },
+    "per_class": {
+      "SUPPORTED": {
+        "support": 6,
+        "recall": 1.0,
+        "precision": 1.0
+      },
+      "INSUFFICIENT": {
+        "support": 6,
+        "recall": 0.8333333333333334,
+        "precision": 1.0
+      },
+      "CONTRADICTED": {
+        "support": 6,
+        "recall": 1.0,
+        "precision": 0.8571428571428571
+      }
+    },
+    "false_accept": 0,
+    "false_accept_rate": 0.0,
+    "false_reject": 0,
+    "false_reject_rate": 0.0
+  },
+  "rows": [
+    {
+      "id": "P56-sup-1",
+      "policy_id": "P56",
+      "gold": "SUPPORTED",
+      "error": null,
+      "pred": "SUPPORTED"
+    },
+    {
+      "id": "P20-sup-1",
+      "policy_id": "P20",
+      "gold": "SUPPORTED",
+      "error": null,
+      "pred": "SUPPORTED"
+    },
+    {
+      "id": "P13-sup-1",
+      "policy_id": "P13",
+      "gold": "SUPPORTED",
+      "error": null,
+      "pred": "SUPPORTED"
+    },
+    {
+      "id": "P61-sup-1",
+      "policy_id": "P61",
+      "gold": "SUPPORTED",
+      "error": null,
+      "pred": "SUPPORTED"
+    },
+    {
+      "id": "P68-sup-1",
+      "policy_id": "P68",
+      "gold": "SUPPORTED",
+      "error": null,
+      "pred": "SUPPORTED"
+    },
+    {
+      "id": "P19-sup-1",
+      "policy_id": "P19",
+      "gold": "SUPPORTED",
+      "error": null,
+      "pred": "SUPPORTED"
+    },
+    {
+      "id": "P56-insuf-1",
+      "policy_id": "P56",
+      "gold": "INSUFFICIENT",
+      "error": null,
+      "pred": "CONTRADICTED"
+    },
+    {
+      "id": "P20-insuf-1",
+      "policy_id": "P20",
+      "gold": "INSUFFICIENT",
+      "error": null,
+      "pred": "INSUFFICIENT"
+    },
+    {
+      "id": "P68-insuf-1",
+      "policy_id": "P68",
+      "gold": "INSUFFICIENT",
+      "error": null,
+      "pred": "INSUFFICIENT"
+    },
+    {
+      "id": "P19-insuf-1",
+      "policy_id": "P19",
+      "gold": "INSUFFICIENT",
+      "error": null,
+      "pred": "INSUFFICIENT"
+    },
+    {
+      "id": "P14-insuf-1",
+      "policy_id": "P14",
+      "gold": "INSUFFICIENT",
+      "error": null,
+      "pred": "INSUFFICIENT"
+    },
+    {
+      "id": "P13-insuf-1",
+      "policy_id": "P13",
+      "gold": "INSUFFICIENT",
+      "error": null,
+      "pred": "INSUFFICIENT"
+    },
+    {
+      "id": "P56-con-1",
+      "policy_id": "P56",
+      "gold": "CONTRADICTED",
+      "error": null,
+      "pred": "CONTRADICTED"
+    },
+    {
+      "id": "P68-con-1",
+      "policy_id": "P68",
+      "gold": "CONTRADICTED",
+      "error": null,
+      "pred": "CONTRADICTED"
+    },
+    {
+      "id": "P20-con-1",
+      "policy_id": "P20",
+      "gold": "CONTRADICTED",
+      "error": null,
+      "pred": "CONTRADICTED"
+    },
+    {
+      "id": "P19-con-1",
+      "policy_id": "P19",
+      "gold": "CONTRADICTED",
+      "error": null,
+      "pred": "CONTRADICTED"
+    },
+    {
+      "id": "P61-con-1",
+      "policy_id": "P61",
+      "gold": "CONTRADICTED",
+      "error": null,
+      "pred": "CONTRADICTED"
+    },
+    {
+      "id": "P13-con-1",
+      "policy_id": "P13",
+      "gold": "CONTRADICTED",
+      "error": null,
+      "pred": "CONTRADICTED"
+    }
+  ]
+}

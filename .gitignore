@@ -1,0 +1,18 @@
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# secrets & local env — never commit a key
+.env
+
+# local artefacts
+*.log
+*.zip
+grounding_report_live.txt
+.DS_Store
+
+# NOTE: grounding_eval_results.json is deliberately TRACKED —
+# the v1 live-eval baseline gets committed as part of the release.

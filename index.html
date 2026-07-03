@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Planning Navigator - Southwark</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+<style>
+  :root {
+    --ink: #1c2733; --muted: #5b6b7a; --line: #e3e8ee; --bg: #f7f9fb;
+    --accent: #1d6fb8; --warn-bg: #fff6e6; --warn-line: #e7b84b; --warn-ink: #6b4e0e;
+    --heritage: #7a3fb0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--ink); background: var(--bg);
+  }
+  header { padding: 20px 22px 14px; border-bottom: 1px solid var(--line); background: #fff; }
+  header h1 { margin: 0; font-size: 19px; letter-spacing: -0.01em; }
+  header p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+  .wrap { display: grid; grid-template-columns: 1fr 380px; gap: 0; height: calc(100vh - 64px); }
+  @media (max-width: 820px) { .wrap { grid-template-columns: 1fr; height: auto; } #map { height: 52vh; } }
+  #map { width: 100%; height: 100%; background: #dfe6ec; }
+  .panel { border-left: 1px solid var(--line); background: #fff; overflow-y: auto; padding: 16px 18px 40px; }
+  .controls { display: flex; gap: 8px; }
+  .controls input {
+    flex: 1; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 15px;
+  }
+  .controls input:focus { outline: 2px solid var(--accent); outline-offset: 0; border-color: var(--accent); }
+  .controls button {
+    padding: 10px 14px; border: 0; border-radius: 8px; background: var(--accent); color: #fff;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  .controls button:hover { filter: brightness(1.05); }
+  .presets { margin: 10px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .presets button {
+    border: 1px solid var(--line); background: #fff; color: var(--accent); border-radius: 20px;
+    padding: 5px 11px; font-size: 12.5px; cursor: pointer;
+  }
+  .presets button:hover { border-color: var(--accent); }
+  .warn {
+    margin: 14px 0 10px; padding: 11px 13px; background: var(--warn-bg); border: 1px solid var(--warn-line);
+    border-radius: 8px; color: var(--warn-ink); font-size: 12.5px; line-height: 1.45;
+  }
+  .sitehead { margin: 6px 0 2px; font-size: 14px; }
+  .sitehead b { font-size: 16px; }
+  .count { color: var(--muted); font-size: 13px; margin: 2px 0 12px; }
+  .section-h { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 18px 0 8px; }
+  .item { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
+  .item .top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 8px; }
+  .item .nm { font-weight: 600; flex: 1 1 auto; min-width: 0; }
+  .tag { font-size: 11px; color: var(--accent); background: #eaf3fb; border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
+  .grade { font-size: 11px; color: #7a4b00; background: #fbf0df; border-radius: 4px; padding: 2px 7px; margin-left: 4px; }
+  .dist { font-size: 11px; color: var(--heritage); background: #f3ecfa; border-radius: 4px; padding: 2px 7px; white-space: nowrap; }
+  .item .imp { color: var(--muted); font-size: 12.5px; margin: 6px 0 0; }
+  .item a { font-size: 12px; color: var(--accent); text-decoration: none; }
+  .item a:hover { text-decoration: underline; }
+  .lb-flag { margin: 0 0 8px; padding: 10px 12px; background: #f3ecfa; border: 1px solid #d9c6ee;
+             border-radius: 8px; color: #4a2772; font-size: 12.5px; line-height: 1.45; }
+  .lb-flag a { color: var(--heritage); }
+  .lb-note { margin: 0 0 8px; padding: 10px 12px; background: #f3f5f8; border: 1px solid var(--line);
+             border-radius: 8px; color: var(--muted); font-size: 12.5px; line-height: 1.45; }
+  .lb-context { color: var(--muted); font-size: 11.5px; margin: 2px 0 4px; line-height: 1.4; }
+  .empty { color: var(--muted); font-size: 13.5px; padding: 6px 0; }
+  .msg { color: #b23; font-size: 13.5px; padding: 8px 0; }
+  .loading { color: var(--muted); font-size: 13.5px; padding: 8px 0; }
+  details { margin-top: 14px; } summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
+  pre { background: #0f1722; color: #cfe3f5; padding: 10px; border-radius: 8px; overflow:auto; font-size: 11px; max-height: 300px; }
+  .legend-dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:5px; vertical-align:middle; }
+  /* policy brief */
+  .pol-plain { font-size: 13px; margin: 2px 0 6px; }
+  .pol-excerpt { font-size: 12px; color: #33414f; background: #f3f5f8; border-left: 3px solid var(--line);
+                 padding: 6px 9px; margin: 6px 0; border-radius: 0 6px 6px 0; font-style: italic; }
+  .pol-abstain { font-size: 12px; color: var(--warn-ink); background: var(--warn-bg); border: 1px solid var(--warn-line);
+                 padding: 6px 9px; border-radius: 6px; margin: 4px 0 6px; }
+  .pol-meta { font-size: 11px; color: var(--muted); margin-top: 4px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .ver { font-size: 10.5px; background: #eef1f4; color: var(--muted); border-radius: 4px; padding: 1px 6px; }
+  .prov { font-size: 10.5px; border-radius: 4px; padding: 1px 6px; }
+  .prov-verified { background: #e7f4ec; color: #1c6b3f; }
+  .prov-curator { background: #fbf0df; color: #7a4b00; }
+  .doc-group .dh { font-size: 11.5px; color: var(--muted); margin: 8px 0 3px; }
+  .doc-list { margin: 0; padding-left: 18px; font-size: 12.5px; }
+  .doc-list li { margin: 2px 0; }
+  .doc-when { color: var(--muted); font-size: 11.5px; }
+  .abstain-box { background: #f3f5f8; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin: 8px 0; font-size: 12px; color: #45525f; }
+  .abstain-box ul { margin: 4px 0 0; padding-left: 18px; }
+  .note-line { font-size: 12px; color: #45525f; background: #f7f4ee; border: 1px solid #ecd9b0; border-radius: 6px; padding: 8px 10px; margin: 6px 0; line-height: 1.45; }
+  .disclaimer { font-size: 11.5px; color: var(--muted); margin-top: 10px; line-height: 1.4; border-top: 1px dashed var(--line); padding-top: 8px; }
+  /* summary strip + collapsible sections */
+  .strip { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 2px; }
+  .chip { font-size: 11.5px; color: #33414f; background: #eef1f4; border: 1px solid var(--line); border-radius: 999px; padding: 3px 10px; }
+  details.sec { margin-top: 6px; }
+  details.sec > summary { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 18px 0 8px; cursor: pointer; user-select: none; }
+  details.sec > summary:hover { color: #33414f; }
+  details.subsec { margin: 8px 0; }
+  details.subsec > summary { font-size: 11.5px; color: var(--muted); cursor: pointer; user-select: none; margin: 8px 0 3px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Planning Navigator <span style="color:var(--muted);font-weight:400;">· Southwark</span></h1>
+  <p>Postcode → area constraints, nearby listed buildings, and a single-storey rear-extension policy brief, from open planning data. Context only, not planning advice.</p>
+</header>
+
+<div class="wrap">
+  <div id="map"></div>
+  <aside class="panel">
+    <div class="controls">
+      <input id="pc" type="text" placeholder="Enter a postcode (e.g. SE21 7BG)" autocomplete="off" />
+      <button id="go">Check site</button>
+    </div>
+    <div class="presets" id="presets"></div>
+    <div class="warn" id="warn">⚠ This shows constraints <b>found</b> in open data. Absence here does <b>not</b> mean a site is unconstrained — always confirm with Southwark.</div>
+    <div id="results"></div>
+    <details id="rawwrap" style="display:none;">
+      <summary>Show raw API response (debug)</summary>
+      <pre id="raw"></pre>
+    </details>
+  </aside>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+  const PRESETS = [
+    { pc: "SE21 7BG", label: "Dulwich Village" },
+    { pc: "SE1 9TG",  label: "Bankside / Tate Modern" },
+    { pc: "SE15 5JR", label: "Peckham (Rye Lane)" },
+  ];
+
+  const COLORS = {
+    "conservation-area": "#1d6fb8", "article-4-direction-area": "#d35400",
+    "tree-preservation-zone": "#27ae60", "flood-risk-zone": "#2980b9",
+    "scheduled-monument": "#7f5539", "listed-building": "#7a3fb0",
+    "listed-building-outline": "#9b59b6", "_default": "#c0392b",
+  };
+  const colorFor = (ds) => COLORS[ds] || COLORS._default;
+
+  const map = L.map("map").setView([51.485, -0.08], 12);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19, attribution: "© OpenStreetMap contributors",
+  }).addTo(map);
+
+  let siteMarker = null;
+  let layer = L.layerGroup().addTo(map);
+  const $ = (id) => document.getElementById(id);
+
+  PRESETS.forEach((p) => {
+    const b = document.createElement("button");
+    b.textContent = p.pc; b.title = p.label;
+    b.onclick = () => { $("pc").value = p.pc; check(); };
+    $("presets").appendChild(b);
+  });
+  $("go").onclick = check;
+  $("pc").addEventListener("keydown", (e) => { if (e.key === "Enter") check(); });
+
+  async function check() {
+    const pc = $("pc").value.trim();
+    if (!pc) return;
+    $("results").innerHTML = '<div class="loading">Looking up ' + esc(pc) + '…</div>';
+    layer.clearLayers();
+    if (siteMarker) { map.removeLayer(siteMarker); siteMarker = null; }
+
+    let data;
+    try {
+      const r = await fetch("/api/site?postcode=" + encodeURIComponent(pc));
+      data = await r.json();
+      if (!r.ok) { $("results").innerHTML = '<div class="msg">' + esc(data.detail || "Something went wrong.") + '</div>'; return; }
+    } catch (err) {
+      $("results").innerHTML = '<div class="msg">Could not reach the server. Is it running?</div>';
+      return;
+    }
+
+    const { latitude, longitude } = data.site;
+    siteMarker = L.marker([latitude, longitude]).addTo(map).bindPopup("<b>Your site</b><br>" + esc(data.site.postcode));
+
+    // area constraints + outlines (request A)
+    const geo = L.geoJSON(data.geojson, {
+      style: (f) => ({ color: colorFor((f.properties || {}).dataset), weight: 2, fillOpacity: 0.12 }),
+      pointToLayer: (f, ll) => L.circleMarker(ll, { radius: 6, color: colorFor((f.properties||{}).dataset), weight: 2, fillOpacity: 0.7 }),
+      onEachFeature: (f, lyr) => { const p = f.properties || {}; lyr.bindPopup("<b>" + esc(p.name || p.reference || "(unnamed)") + "</b><br>" + esc((p.dataset||"").replace(/-/g," "))); },
+    });
+    layer.addLayer(geo);
+
+    // nearby listed-building points (request B) + radius circle
+    const lb = data.listed_buildings || {};
+    const radiusCircle = L.circle([latitude, longitude], {
+      radius: lb.radius_m || 100, color: "#7a3fb0", weight: 1, dashArray: "4 4", fillOpacity: 0.04,
+    });
+    layer.addLayer(radiusCircle);
+    let listedLayer = null;
+    if (lb.geojson) {
+      listedLayer = L.geoJSON(lb.geojson, {
+        pointToLayer: (f, ll) => L.circleMarker(ll, { radius: 6, color: "#7a3fb0", weight: 2, fillColor: "#7a3fb0", fillOpacity: 0.8 }),
+        onEachFeature: (f, lyr) => { const p = f.properties || {}; lyr.bindPopup("<b>" + esc(p.name || "(listed building)") + "</b><br>Listed building" + (p.listed_building_grade ? " · Grade " + esc(p.listed_building_grade) : "")); },
+      });
+      layer.addLayer(listedLayer);
+    }
+
+    try {
+      const members = [siteMarker, geo, radiusCircle];
+      if (listedLayer) members.push(listedLayer);
+      map.fitBounds(L.featureGroup(members).getBounds().pad(0.2), { maxZoom: 17 });
+    } catch { map.setView([latitude, longitude], 16); }
+
+    renderPanel(data);
+  }
+
+  function renderPanel(data) {
+    const s = data.site;
+    let html = "";
+    html += '<div class="sitehead"><b>' + esc(s.postcode) + '</b></div>';
+    html += '<div class="count">' + esc(s.admin_district || "Unknown district")
+          + (s.in_southwark ? "" : " — not Southwark") + " · "
+          + data.count + " area constraint" + (data.count === 1 ? "" : "s") + " found</div>";
+
+    (data.warnings || []).forEach((w, i) => { if (i > 0) html += '<div class="warn">' + esc(w) + '</div>'; });
+
+    // ---- Summary strip ----
+    const lb = data.listed_buildings || {};
+    const sl0 = lb.site_listing || {};
+    const polOk = (data.policy && !data.policy.error) ? data.policy : null;
+    const lbSummary = lb.available === false ? 'lookup unavailable'
+      : (sl0.overlaps ? 'outline overlap' + ((lb.count || 0) ? ' · ' + lb.count + ' nearby' : '')
+                      : ((lb.count || 0) ? lb.count + ' nearby' : 'none found'));
+    html += '<div class="strip">'
+          + '<span class="chip">' + data.count + ' constraint' + (data.count === 1 ? '' : 's') + '</span>'
+          + '<span class="chip">listed: ' + lbSummary + '</span>'
+          + (polOk ? '<span class="chip">' + (polOk.applicable_policies || []).length + ' policies engaged</span>' : '')
+          + '</div>';
+
+    // ---- Listed buildings section (collapsible; open when there is something to see) ----
+    const lbOpen = lb.available === false || sl0.overlaps || (lb.count || 0) > 0;
+    html += '<details class="sec"' + (lbOpen ? ' open' : '') + '><summary>Listed buildings (within ≈' + (lb.radius_m || 100) + ' m) — ' + lbSummary + '</summary>';
+    html += '<div class="lb-context">Shown as context only — whether works need consent, or affect a listed building\'s setting, is for the council to decide. Distances are approximate (listing points are grid references).</div>';
+
+    if (lb.available === false) {
+      html += '<div class="lb-note">The listed-building lookup was temporarily unavailable. Try again.</div>';
+    } else {
+      const sl = lb.site_listing || {};
+      if (sl.overlaps) {
+        html += '<div class="lb-flag">A listed-building outline <b>appears to overlap this point</b> — indicative only; confirm with <a href="https://historicengland.org.uk/listing/the-list/" target="_blank" rel="noopener">Historic England</a> / Southwark.';
+        (sl.matches || []).forEach((m) => {
+          html += '<div style="margin-top:6px;">• ' + esc(m.name) + (m.grade ? ' <span class="grade">Grade ' + esc(m.grade) + '</span>' : '')
+                + (m.source_url ? ' <a href="' + m.source_url + '" target="_blank" rel="noopener">source →</a>' : '') + '</div>';
+        });
+        html += '</div>';
+      } else {
+        html += '<div class="lb-note">No listed-building outline overlaps this point. Outline coverage is partial, so this does <b>not</b> confirm the building is unlisted — check the list below and the <a href="https://historicengland.org.uk/listing/the-list/" target="_blank" rel="noopener">National Heritage List</a>.</div>';
+      }
+
+      const nearby = lb.nearby || [];
+      if (!nearby.length) {
+        html += '<div class="empty">No listed buildings found within ≈' + (lb.radius_m || 100) + ' m. Coverage varies — absence is not confirmation.</div>';
+      } else {
+        html += '<div class="count" style="margin:0 0 8px;">' + nearby.length + ' listed building' + (nearby.length === 1 ? "" : "s") + ' within ≈' + (lb.radius_m || 100) + ' m</div>';
+        nearby.forEach((n) => {
+          html += '<div class="item"><div class="top"><span class="nm">' + esc(n.name) + '</span>'
+                + '<span>' + (n.grade ? '<span class="grade">Grade ' + esc(n.grade) + '</span>' : '')
+                + '<span class="dist">≈' + esc(n.distance_m) + ' m ' + esc(n.bearing) + '</span></span></div>';
+          if (n.source_url) html += '<div style="margin-top:6px;"><a href="' + n.source_url + '" target="_blank" rel="noopener">View source on planning.data.gov.uk →</a></div>';
+          html += '</div>';
+        });
+      }
+    }
+
+    html += '</details>';
+
+    // ---- Area constraints section (collapsible, open) ----
+    html += '<details class="sec" open><summary>Area constraints (' + data.count + ')</summary>';
+    if (!data.constraints.length) {
+      html += '<div class="empty">No constraints found in the queried datasets at this point. Remember: absence ≠ unconstrained.</div>';
+    } else {
+      data.constraints.forEach((c) => {
+        html += '<div class="item"><div class="top"><span class="nm">' + esc(c.name) + '</span>';
+        html += '<span><span class="legend-dot" style="background:' + colorFor(c.dataset) + '"></span><span class="tag">' + esc(c.dataset_label) + '</span>';
+        if (c.grade) html += '<span class="grade">Grade ' + esc(c.grade) + '</span>';
+        html += '</span></div>';
+        if (c.implication) html += '<div class="imp">' + esc(c.implication) + '</div>';
+        if (c.source_url) html += '<div style="margin-top:6px;"><a href="' + c.source_url + '" target="_blank" rel="noopener">View source on planning.data.gov.uk →</a></div>';
+        html += '</div>';
+      });
+    }
+
+    html += '</details>';
+
+    // ---- Planning policy section (collapsible, open) ----
+    const pol = data.policy;
+    if (pol && !pol.error) {
+      const scheme = (pol.scheme_type || "").replace(/-/g, " ");
+      const nPol = (pol.applicable_policies || []).length;
+      html += '<details class="sec" open><summary>Planning policy — ' + esc(scheme) + ' (' + nPol + ' ' + (nPol === 1 ? 'policy' : 'policies') + ')</summary>';
+      html += '<div class="lb-context">Relevant Southwark policies and required documents, shown as context — not advice on whether permission will be granted. The officer decides.</div>';
+
+      (pol.applicable_policies || []).forEach((p) => {
+        const prov = p.excerpt_provenance === "verified-curator"
+          ? '<span class="prov prov-curator" title="excerpt supplied by the curator from the Plan">curator-sourced</span>'
+          : '<span class="prov prov-verified" title="excerpt pulled from the official Plan">verified</span>';
+        html += '<div class="item"><div class="top"><span class="nm">' + esc(p.id) + ' · ' + esc(p.title) + '</span><span>' + prov + '</span></div>';
+        html += '<div class="pol-meta">' + esc(p.applies_because) + '</div>';
+        if (p.plain_english) {
+          html += '<div class="pol-plain">' + esc(p.plain_english) + '</div>';
+        } else {
+          html += '<div class="pol-abstain">Couldn\'t produce a confidently grounded summary (' + esc((p.grounding_status || "").toLowerCase()) + ') — read the policy text below or ask a Southwark planning officer.</div>';
+        }
+        if (p.cited_excerpt) html += '<div class="pol-excerpt">“' + esc(p.cited_excerpt) + '”</div>';
+        html += '<div class="pol-meta">';
+        if (p.source_url) html += '<a href="' + p.source_url + '" target="_blank" rel="noopener">Source →</a>';
+        if (p.source_version) html += '<span class="ver">' + esc(p.source_version) + '</span>';
+        html += '</div></div>';
+      });
+
+      (pol.notes || []).forEach((n) => { html += '<div class="note-line">' + esc(n) + '</div>'; });
+
+      const rd = pol.required_documents || {};
+      const nDocs = (rd.always || []).length + (rd.triggered_by_constraints || []).length + (rd.design_dependent || []).length;
+      html += '<details class="subsec"><summary>Documents you\'ll need (' + nDocs + ')</summary><div class="doc-group"><div class="dh">Always required</div><ul class="doc-list">';
+      (rd.always || []).forEach((d) => { html += '<li>' + esc(d.name) + '</li>'; });
+      html += '</ul>';
+      if ((rd.triggered_by_constraints || []).length) {
+        html += '<div class="dh">Also needed here (from your site\'s constraints)</div><ul class="doc-list">';
+        rd.triggered_by_constraints.forEach((d) => { html += '<li>' + esc(d.name) + '</li>'; });
+        html += '</ul>';
+      }
+      if ((rd.design_dependent || []).length) {
+        html += '<div class="dh">May also be needed, depending on your design</div><ul class="doc-list">';
+        rd.design_dependent.forEach((d) => { html += '<li>' + esc(d.name) + (d.when ? ' <span class="doc-when">— if ' + esc(d.when) + '</span>' : '') + '</li>'; });
+        html += '</ul>';
+      }
+      html += '</div></details>';
+
+      if ((pol.abstentions || []).length) {
+        html += '<details class="subsec" open><summary>Not determined here (' + pol.abstentions.length + ')</summary>'
+              + '<div class="abstain-box"><b>Check with a Southwark planning officer:</b><ul>';
+        pol.abstentions.forEach((a) => { html += '<li>' + esc(a) + '</li>'; });
+        html += '</ul></div></details>';
+      }
+
+      if (pol.disclaimer) html += '<div class="disclaimer">' + esc(pol.disclaimer) + (pol.attribution ? '<br>' + esc(pol.attribution) : '') + '</div>';
+      html += '</details>';
+    } else if (pol && pol.error) {
+      html += '<div class="section-h">Planning policy</div><div class="lb-note">' + esc(pol.error) + '</div>';
+    }
+
+    $("results").innerHTML = html;
+    $("raw").textContent = JSON.stringify({ geojson: data.geojson, listed_buildings: data.listed_buildings, policy: data.policy }, null, 2);
+    $("rawwrap").style.display = "block";
+  }
+
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c])); }
+</script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+# Gold-label policy map — SINGLE-STOREY REAR EXTENSION (Southwark)
+# Hand-curated and verified against the live Southwark documents (curation date: 2026-07-01).
+# This file is the "gold labels": it decides WHICH policies apply. Retrieval/LLM never decide relevance.
+#
+# status per policy:
+#   verified          = title AND excerpt pulled verbatim from an official Southwark source by the assistant.
+#   verified-curator  = title verified by the assistant; excerpt supplied verbatim by the curator from the
+#                       Southwark Plan (assistant PDF extraction could not reach these). A final character-exact
+#                       eyeball vs the PDF is recommended, since these are the grounding-check ground truth.
+
+scheme_type: single-storey-rear-extension
+applies_to: >-
+  A house (dwellinghouse). NOTE - permitted development does NOT apply to flats/maisonettes;
+  those need a full planning application, not a householder application (Householder SPD 2025).
+
+source_docs:
+  - name: "Southwark Plan 2022 (development management policies)"
+    version: "adopted 2022-02-23; plan period 2019-2036"
+    url: "https://services.southwark.gov.uk/assets/attach/233497/Southwark-Plan-development-management-policies.pdf"
+  - name: "Southwark Plan 2022 (full plan)"
+    version: "adopted 2022-02-23"
+    url: "https://services.southwark.gov.uk/assets/attach/94325/Southwark-Plan-2022.pdf"
+  - name: "Householder SPD 2025"
+    version: "2025-08 (guidance for applying the Plan; 'does not contain new policy'; a material consideration)"
+    url: "https://www.southwark.gov.uk/sites/default/files/2025-08/Householder%20SPD%202025.pdf"
+  - name: "Householder application validation checklist"
+    version: "page last updated 2025-07-03"
+    url: "https://www.southwark.gov.uk/planning-environment-and-building-control/planning/planning-checklists-householder-application"
+  - name: "Heritage SPD 2021 (referenced for heritage / design & access statements)"
+    version: "2021"
+
+# ---------------------------------------------------------------------------
+# BASE POLICIES — always engaged by a single-storey rear extension to a house.
+# ---------------------------------------------------------------------------
+base_policies:
+  - id: P13
+    title: "Design of places"
+    status: verified
+    excerpt: "height, scale, massing and arrangement respond positively to the existing townscape, character and context"
+    why: "Governs how the extension's form, scale and materials relate to the house and street."
+  - id: P14
+    title: "Design quality"
+    status: verified
+    excerpt: "adequate daylight, sunlight, outlook, and a comfortable microclimate ... for new and existing residents"
+    why: "Design quality incl. daylight/sunlight/outlook for the applicant AND neighbours, and durable quality materials."
+  - id: P15
+    title: "Residential Design"
+    status: verified
+    excerpt: "the impact on the amenity of adjoining occupiers, and the quality of accommodation"
+    why: "Residential design standards; for an extension the adjoining-amenity clause applies (space standards are new-build oriented)."
+  - id: P56
+    title: "Protection of amenity"
+    status: verified
+    excerpt: "Development should not be permitted when it causes an unacceptable loss of amenity to present or future occupiers or users"
+    why: "THE neighbour-amenity policy: overlooking/privacy, loss of light, overshadowing, sense of enclosure, noise. Core for a rear extension."
+
+# ---------------------------------------------------------------------------
+# CONSTRAINT-TRIGGERED POLICIES — each constraint maps to { policies, required_documents_added?, notes? }.
+# Added ONLY when the v1/v2 constraint layer reports that constraint at the site.
+# ---------------------------------------------------------------------------
+constraint_triggered_policies:
+  conservation-area:
+    policies:
+      - id: P20
+        title: "Conservation areas"
+        status: verified
+        excerpt: "preserves or enhances the character or appearance of conservation areas and their settings"
+        why: "An extension in a conservation area is judged on preserving/enhancing its character and appearance."
+    required_documents_added:
+      - "Design & access statement (checklist -> P13; also if on a conservation-area border)"
+
+  listed-building:
+    policies:
+      - id: P19
+        title: "Listed buildings and structures"
+        status: verified
+        excerpt: "only be permitted if it conserves or enhances their special significance"
+        why: "Works to/affecting a listed building or its setting are judged on conserving its special significance."
+    required_documents_added:
+      - "Heritage statement (checklist: if the home is a listed building)"
+    notes:
+      - "Works to a listed building need SEPARATE Listed Building Consent (Planning (LB & CA) Act 1990). Surface this + point to Historic England; ABSTAIN on whether specific works need consent."
+
+  scheduled-monument:
+    policies:
+      - id: P21
+        title: "Conservation of the historic environment and natural heritage"
+        status: verified
+        excerpt: "conserve and enhance the significance of ... designated and non-designated heritage assets and their settings"
+        why: "Covers scheduled monuments, archaeological interest, TPO/conservation-area trees, Article 4 buildings, etc."
+
+  archaeological-priority-area:
+    policies:
+      - id: P23
+        title: "Archaeology"
+        status: verified
+        excerpt: "conserve the archaeological resources commensurate to its significance"
+        why: "Southwark has 6 APAs (incl. APA4 Peckham Village, APA5 Dulwich Village). Groundworks in an APA engage this."
+    required_documents_added:
+      - "Archaeological desk-based assessment (checklist -> P23: groundworks within an APA, or new/extended basements)"
+
+  tree-preservation-zone:
+    policies:
+      - id: P61
+        title: "Trees"
+        status: verified-curator
+        excerpt: "Development must retain and protect significant existing trees. Retained trees must be protected during the construction process in line with British Standard BS5837."
+        source_note: "Curator-supplied verbatim from the Southwark Plan (P61); assistant PDF extraction could not reach it. Final character-exact eyeball vs the PDF recommended."
+        why: "Protected trees on/near the site the extension could affect (retention + protection during building work)."
+      - id: P21
+        title: "Conservation of the historic environment and natural heritage"
+        status: verified
+        excerpt: "Trees that are subject to a Tree Preservation Order (TPO)"
+        why: "P21 also protects TPO trees and trees contributing to a conservation area's character."
+    required_documents_added:
+      - "Tree survey / arboricultural report (checklist -> P59, P61)"
+    notes:
+      - "Works to TPO trees or trees in a conservation area need SEPARATE consent. Surface; ABSTAIN on specifics."
+
+  flood-risk-zone:
+    policies:
+      - id: P68
+        title: "Reducing flood risk"
+        status: verified-curator
+        excerpt: "Development must not increase flood risk on or off site"
+        source_note: "Curator-supplied verbatim from the Southwark Plan (P68); assistant PDF extraction could not reach it. Final character-exact eyeball vs the PDF recommended. NB: 2022 Plan numbering is 'P68 Reducing flood risk' (an older document mislabels flood risk as 'P67' - ignore that pre-2022 numbering)."
+        why: "Site in a mapped flood-risk zone."
+    notes:
+      # FLOOD CAVEAT - kept exactly as written and reviewed; do not soften.
+      - "FLOOD WORDING (careful): do NOT say a flood risk assessment is 'not required'. The householder validation checklist does not clearly mandate a Site-Specific Flood Risk Assessment for a single-storey rear extension, BUT a site in Flood Zone 2/3 or a Critical Drainage Area should CONFIRM with Southwark / the Environment Agency, because the council's validation requirements set FRA needs by area and other guidance may still trigger one. ABSTAIN on whether an FRA is required; never invent the requirement, never rule it out."
+
+  article-4-direction-area:
+    policies:
+      - id: P21
+        title: "Conservation of the historic environment and natural heritage"
+        status: verified
+        excerpt: "Buildings and land with Article 4 (1) directions inside and outside conservation areas"
+        why: "P21 lists Article 4 land among protected assets."
+    notes:
+      - "KEY CONTEXT (abstain on the verdict): an Article 4 direction can remove permitted-development rights, so a rear extension that might otherwise be permitted development may need a full householder application HERE. Whether it does depends on the SPECIFIC direction's scope + the GPDO limits. Surface as context; ABSTAIN on the definitive PD-vs-application call. (Also: PD never applies to flats/maisonettes.)"
+
+# ---------------------------------------------------------------------------
+# REQUIRED DOCUMENTS — from the validation checklist, for a single-storey rear extension.
+# ---------------------------------------------------------------------------
+required_documents:
+  always:
+    - {name: "Application form (Householder planning consent)", source: "checklist"}
+    - {name: "Ownership certificate (A/B/C/D)", source: "checklist"}
+    - {name: "CIL additional information form", source: "checklist (required for all application types)"}
+    - {name: "Location plan (1:1250 or 1:2500)", source: "checklist"}
+    - {name: "Site plan (1:100 or 1:50)", source: "checklist"}
+    - {name: "Existing & proposed floor plans", source: "checklist", policies: [P13, P14, P15, P56]}
+    - {name: "Existing & proposed elevation drawings", source: "checklist", policies: [P13, P14, P15, P56]}
+  conditional:
+    - {name: "Existing & proposed section drawings", when: "altering roof/ceiling heights or ground levels"}
+    - {name: "Roof plans", when: "adding an extension / roof lights"}
+    - {name: "Levels or gradients plan", when: "changing ground levels vs neighbours"}
+    - {name: "Design & access statement", when: "in (or bordering) a conservation area", policies: [P13]}
+    - {name: "Heritage statement", when: "the home is a listed building", policies: [P19]}
+    - {name: "Daylight & sunlight impact assessment", when: "might reduce a neighbour's daylight/sunlight", policies: [P14, P56], note: "Checklist cites P55, but P55 is 'Parking standards for disabled people' - see checklist_discrepancy. Using P14/P56."}
+    - {name: "Archaeological desk-based assessment", when: "groundworks within an APA, or new/extended basement", policies: [P23]}
+    - {name: "Tree survey / arboricultural report", when: "trees on/near the site could be affected", policies: [P61], note: "Checklist cites P59 (Green infrastructure) and P61; P59 is not curated in this slice, so only P61 is referenced here."}
+  # Not typically engaged by a single-storey rear extension (only if that feature is present):
+  #   cycle parking (P53), basement impact assessment (P14, P68), noise impact assessment (P56, P66).
+
+# ---------------------------------------------------------------------------
+# ABSTENTION NOTES — trigger "not specifically addressed; check with a Southwark planning officer".
+# ---------------------------------------------------------------------------
+abstention_notes:
+  - "Whether the works are permitted development vs need a householder application (esp. under an Article 4 direction) - not determined here; depends on the GPDO limits and the specific direction."
+  - "Whether the scheme meets quantitative design guidance (e.g. extension depth/height limits in the Householder SPD) - dimensions are not assessed in this slice."
+  - "Listed Building Consent specifics - surfaced and pointed to Historic England; not adjudicated."
+  - "Flood risk assessment necessity - not clearly mandated by the householder checklist for a rear extension, but a flood-zone / Critical Drainage Area site should confirm with Southwark / the Environment Agency (see flood note)."
+  - "Anything the Plan/SPD do not clearly address for this scheme."
+
+# ---------------------------------------------------------------------------
+# CURATION FLAGS — surfaced honestly for review (do NOT silently propagate).
+# ---------------------------------------------------------------------------
+checklist_discrepancy:
+  - field: "Daylight & sunlight impact assessment"
+    checklist_says: "Southwark Plan 2022 policy P55"
+    problem: "P55 is 'Parking standards for disabled people and the physically impaired' (verified across multiple Southwark committee reports). It is NOT the daylight/sunlight/amenity policy."
+    resolution: "The daylight/sunlight/amenity policies are P14 (Design quality, which explicitly covers daylight, sunlight, outlook) and P56 (Protection of amenity). This appears to be a checklist typo (P55 -> P56). Map uses P14/P56. Exactly the source-inconsistency the grounding check is meant to catch."
+
+provenance_and_licence:
+  attribution_required: "Contains public sector information licensed under the Open Government Licence."
+  notes:
+    - "Southwark Council publishes public-sector information under the Open Government Licence (their open-data page cites OGL; OGL is the default for councils under the Re-use of Public Sector Information Regulations 2015). Council-authored policy TEXT is reusable as short attributed excerpts with a link to source."
+    - "OGL does NOT cover Ordnance Survey basemaps, figures, logos or third-party content in the Plan - the tool reuses only short TEXT excerpts, never the maps/figures, and always links to the official source."
+    - "Belt-and-braces regardless of licence: keep excerpts short, attribute the policy, link out; do not reproduce whole policies."
+    - "OGL VERSION: checked both Plan PDFs (DM-policies + full Plan) for 'Open Government Licence' / 'OGL' / 'licence' - neither prints an OGL notice or version. The OGL basis therefore rests on Southwark's open-data terms and the statutory PSI default, not a notice on the Plan itself, so no version is asserted here."
+
+status_summary:
+  policies_selected: 10  # 4 base (P13 P14 P15 P56) + 6 unique constraint-triggered (P19 P20 P21 P23 P61 P68); P21 reused across scheduled-monument/trees/Article 4
+  all_excerpts_filled: true
+  verified_by_assistant: [P13, P14, P15, P56, P19, P20, P21, P23]
+  verified_curator_supplied: [P61, P68]      # final character-exact eyeball vs the PDF recommended
+  open_items:
+    - "RESOLVED (character-check 2026-07-02): Plan PDFs print no OGL version; none asserted. OGL basis = Southwark open-data terms + statutory PSI default. P56/P61/P68 excerpts confirmed verbatim against the Plan (P56 leading capital corrected)."
